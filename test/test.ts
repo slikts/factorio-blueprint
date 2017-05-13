@@ -1,14 +1,14 @@
-import Blueprint from '../src/Blueprint';
-import * as fs from 'fs'
+import { Blueprint } from '..';
+import * as fs from 'fs';
 
-import * as test from 'tape'
+import * as test from 'tape';
 
 test('basic import', (t) => {
-  t.plan(1)
-  const bps = fs.readFileSync('test/balancer.bp', 'utf8')
+  t.plan(1);
+  const bps = fs.readFileSync('test/balancer.bp', 'utf8');
 
-  const bp = new Blueprint(bps)
+  const bp = new Blueprint(bps);
 
-  const json = JSON.stringify(bp.toObject())
-  t.equals(json, JSON.stringify(JSON.parse(fs.readFileSync('test/balancer.json', 'utf8'))))
-})
+  const json = JSON.stringify(bp.toObject());
+  t.equals(json, JSON.stringify(JSON.parse(fs.readFileSync('test/balancer.json', 'utf8'))));
+});
