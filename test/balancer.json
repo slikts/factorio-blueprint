@@ -1,0 +1,120 @@
+{
+  "blueprint": {
+    "icons": [
+      {
+        "signal": {
+          "type": "item",
+          "name": "express-transport-belt"
+        },
+        "index": 1
+      },
+      {
+        "signal": {
+          "type": "item",
+          "name": "express-underground-belt"
+        },
+        "index": 2
+      }
+    ],
+    "entities": [
+      {
+        "name": "express-transport-belt",
+        "position": {
+          "x": 0,
+          "y": -1
+        },
+        "direction": 6,
+        "type": "input",
+        "connections": {},
+        "control_behavior": {},
+        "entity_number": 1
+      },
+      {
+        "name": "express-underground-belt",
+        "position": {
+          "x": -1,
+          "y": -2
+        },
+        "direction": 0,
+        "type": "output",
+        "connections": {},
+        "control_behavior": {},
+        "entity_number": 2
+      },
+      {
+        "name": "express-underground-belt",
+        "position": {
+          "x": -1,
+          "y": -1
+        },
+        "direction": 0,
+        "type": "input",
+        "connections": {},
+        "control_behavior": {},
+        "entity_number": 3
+      },
+      {
+        "name": "express-underground-belt",
+        "position": {
+          "x": 0,
+          "y": -2
+        },
+        "direction": 0,
+        "type": "output",
+        "connections": {},
+        "control_behavior": {},
+        "entity_number": 4
+      },
+      {
+        "name": "express-transport-belt",
+        "position": {
+          "x": 1,
+          "y": -2
+        },
+        "direction": 6,
+        "type": "input",
+        "connections": {},
+        "control_behavior": {},
+        "entity_number": 5
+      },
+      {
+        "name": "express-transport-belt",
+        "position": {
+          "x": 1,
+          "y": -1
+        },
+        "direction": 0,
+        "type": "input",
+        "connections": {},
+        "control_behavior": {},
+        "entity_number": 6
+      },
+      {
+        "name": "express-splitter",
+        "position": {
+          "x": 0.5,
+          "y": 0
+        },
+        "direction": 0,
+        "type": "input",
+        "connections": {},
+        "control_behavior": {},
+        "entity_number": 7
+      },
+      {
+        "name": "express-transport-belt",
+        "position": {
+          "x": 0,
+          "y": 1
+        },
+        "direction": 0,
+        "type": "input",
+        "connections": {},
+        "control_behavior": {},
+        "entity_number": 8
+      }
+    ],
+    "item": "blueprint",
+    "version": 64425099264
+  }
+}
