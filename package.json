@@ -4,7 +4,8 @@
   "description": "Factorio Blueprints API",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "ts-node test/test.ts",
+    "test:watch": "nodemon -e ts -w ./src -w ./test -x npm test"
   },
   "author": "DemiPixel <luke5227@gmail.com>",
   "license": "ISC",
@@ -14,7 +15,9 @@
     "victor": "^1.1.0"
   },
   "devDependencies": {
+    "nodemon": "^1.11.0",
     "tape": "^4.6.3",
+    "ts-node": "^3.0.4",
     "tslint": "^5.2.0",
     "tslint-config-airbnb": "^1.1.1",
     "typescript": "^2.3.2"

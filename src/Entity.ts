@@ -1,6 +1,6 @@
 import * as Victor from 'victor';
 import Blueprint from './Blueprint';
-import entityData from '../defaultentities';
+import entityData from '../entityData';
 
 export default class Entity {
   id: number;
@@ -29,7 +29,7 @@ export default class Entity {
   INVENTORY_SIZE: any;
 
   constructor(data, positionGrid, bp, center) {
-    let myData = entityData[bp.checkName(data.name)] || {}; // entityData contains info like width, height, filterAmount, etc
+    const myData = entityData[bp.checkName(data.name)] || {}; // entityData contains info like width, height, filterAmount, etc
 
     this.id = -1; // Id used when generating blueprint
     this.bp = bp; // Blueprint
@@ -52,8 +52,8 @@ export default class Entity {
     this.recipe = data.recipe ? this.bp.checkName(data.recipe) : null;
     this.bar = data.bar || -1;
 
-    this.modules = data.items ? data.items.map(module => {
-      return { item: this.bp.checkName(module.item), count: module.count }
+    this.modules = data.items ? data.items.map((module) => {
+      return { item: this.bp.checkName(module.item), count: module.count };
     }) : null;
 
 
@@ -73,7 +73,7 @@ export default class Entity {
     if (center) {
       this.position.add(new Victor(0.5, 0.5)).subtract(this.size.clone().divide(new Victor(2, 2)));
     }
-    this.position = new Victor(Math.round(this.position.x*100)/100, Math.round(this.position.y*100)/100);
+    this.position = new Victor(Math.round(this.position.x * 100) / 100, Math.round(this.position.y * 100) / 100);
   }
 
   // Beautiful string format
@@ -116,16 +116,16 @@ export default class Entity {
   parseConnections(entityList) {
     const conns = this.rawConnections;
     if (!conns) return [];
-    for (let side in conns) {
-      if (Number.isNaN(parseInt(side))) return; // Not a number!
-      for (let color in conns[side]) {
+    for (const side in conns) {
+      if (Number.isNaN(Number.parseInt(side))) return; // Not a number!
+      for (const color in conns[side]) {
         for (let i = 0; i < conns[side][color].length; i++ ) {
           const id = conns[side][color][i]['entity_id'];
           this.connections.push({
-            entity: entityList[id-1],
-            color: color,
-            side: side,
-            id: conns[side][color][i]['circuit_id']
+            entity: entityList[id - 1],
+            color,
+            side,
+            id: conns[side][color][i]['circuit_id'],
           });
         }
       }
@@ -147,11 +147,11 @@ export default class Entity {
   }
 
   // Parse request filters into standard Entity format
-  parseRequestFilters(request_filters) { // Parse request_filters from json (for constructor)
-    if (!request_filters) return [];
-    for (let i = 0; i < request_filters.length; i++) {
-      request_filters[i].name = this.bp.checkName(request_filters[i].name);
-      this.setRequestFilter(request_filters[i].index, request_filters[i].name, request_filters[i].count);
+  parseRequestFilters(requestFilters) { // Parse request_filters from json (for constructor)
+    if (!requestFilters) return [];
+    for (let i = 0; i < requestFilters.length; i++) {
+      requestFilters[i].name = this.bp.checkName(requestFilters[i].name);
+      this.setRequestFilter(requestFilters[i].index, requestFilters[i].name, requestFilters[i].count);
     }
   }
 
@@ -164,22 +164,22 @@ export default class Entity {
     if (condition.output_signal) condition.output_signal.name = this.bp.checkName(condition.output_signal.name);
     const out = {
       left: condition.first_signal ? condition.first_signal.name : undefined,
-      right: condition.second_signal ? condition.second_signal.name : parseInt(condition.constant),
+      right: condition.second_signal ? condition.second_signal.name : Number.parseInt(condition.constant),
       out: condition.output_signal ? condition.output_signal.name : undefined,
 
       controlEnable: condition.circuit_enable_disable, // circuit_enable_disable, true/false
       readContents: condition.circuit_read_hand_contents, // circuit_read_hand_contents, true/false
-      readMode: condition.circuit_contents_read_mode != undefined ? (condition.circuit_contents_read_mode == 0 ? 'pulse' : 'hold') : undefined,
+      readMode: condition.circuit_contents_read_mode !== undefined ? (condition.circuit_contents_read_mode === 0 ? 'pulse' : 'hold') : undefined,
       // XXX
       countFromInput: null,
       operator: null,
     };
-    if (this.name == 'decider_combinator') {
-      out.countFromInput = condition.copy_count_from_input == 'true';
+    if (this.name === 'decider_combinator') {
+      out.countFromInput = condition.copy_count_from_input === 'true';
     }
 
     if (condition.comparator) // Set operator
-      out.operator = condition.comparator == ':' ? '=' : condition.comparator;
+      out.operator = condition.comparator === ':' ? '=' : condition.comparator;
     else
       out.operator = condition.operation;
 
@@ -219,13 +219,13 @@ export default class Entity {
 
   // Adds self to grid array
   setTileData(positionGrid) {
-    this.tileDataAction(positionGrid, (x, y) => positionGrid[x+','+y] = this);
+    this.tileDataAction(positionGrid, (x, y) => positionGrid[x + ',' + y] = this);
     return this;
   }
 
   // Removes self from grid array
   removeTileData(positionGrid) {
-    this.tileDataAction(positionGrid, (x, y) => delete positionGrid[x+','+y]);
+    this.tileDataAction(positionGrid, (x, y) => delete positionGrid[x + ',' + y]);
     return this;
   }
 
@@ -235,7 +235,7 @@ export default class Entity {
 
     if (!ent) return true;
 
-    if ((this.name == 'gate' && ent.name == 'straight_rail') || (ent.name == 'gate' && this.name == 'straight_rail')) return true;
+    if ((this.name === 'gate' && ent.name === 'straight_rail') || (ent.name === 'gate' && this.name === 'straight_rail')) return true;
 
     return false;
   }
@@ -244,7 +244,7 @@ export default class Entity {
   getOverlap(positionGrid) {
     let item = null;
     this.tileDataAction(positionGrid, (x, y) => {
-      item = positionGrid[x+','+y] || item;
+      item = positionGrid[x + ',' + y] || item;
     });
     return item;
   }
@@ -266,14 +266,14 @@ export default class Entity {
     mySide = convertSide(mySide, this);
     theirSide = convertSide(theirSide, ent);
 
-    const checkCombinator = name => {
-      return name == 'decider_combinator' || name == 'arithmetic_combinator';
-    }
+    const checkCombinator = (name) => {
+      return name === 'decider_combinator' || name === 'arithmetic_combinator';
+    };
 
-    color = color == 'green' ? color : 'red';
+    color = color === 'green' ? color : 'red';
 
-    this.connections.push({ entity: ent, color: color, side: mySide, id: checkCombinator(ent.name) ? theirSide : undefined });
-    ent.connections.push({ entity: this, color: color, side: theirSide, id: checkCombinator(this.name) ? mySide : undefined });
+    this.connections.push({ entity: ent, color, side: mySide, id: checkCombinator(ent.name) ? theirSide : undefined });
+    ent.connections.push({ entity: this, color, side: theirSide, id: checkCombinator(this.name) ? mySide : undefined });
     return this;
   }
 
@@ -284,13 +284,13 @@ export default class Entity {
     color = color || 'red';
 
     for (let i = 0; i < this.connections.length; i++) {
-      if (this.connections[i].entity == ent && this.connections[i].side == mySide && this.connections[i].color == color) {
+      if (this.connections[i].entity === ent && this.connections[i].side === mySide && this.connections[i].color === color) {
         this.connections.splice(i, 1);
         break;
       }
     }
     for (let i = 0; i < ent.connections.length; i++) {
-      if (ent.connections[i].entity == this && ent.connections[i].side == theirSide && ent.connections[i].color == color) {
+      if (ent.connections[i].entity === this && ent.connections[i].side === theirSide && ent.connections[i].color === color) {
         ent.connections.splice(i, 1);
         break;
       }
@@ -300,12 +300,12 @@ export default class Entity {
 
   // Remove all wire connections with entity (optionally of a specific color)
   removeConnectionsWithEntity(ent, color) {
-    for (let i = this.connections.length-1; i >= 0; i--) {
-      if (this.connections[i].entity == ent && (!color || this.connections[i].color == color)) this.connections.splice(i, 1);
+    for (let i = this.connections.length - 1; i >= 0; i--) {
+      if (this.connections[i].entity === ent && (!color || this.connections[i].color === color)) this.connections.splice(i, 1);
     }
 
-    for (let i = ent.connections.length-1; i >= 0; i--) {
-      if (ent.connections[i].entity == this && (!color || ent.connections[i].color == color)) ent.connections.splice(i, 1);
+    for (let i = ent.connections.length - 1; i >= 0; i--) {
+      if (ent.connections[i].entity === this && (!color || ent.connections[i].color === color)) ent.connections.splice(i, 1);
     }
     return this;
   }
@@ -313,9 +313,9 @@ export default class Entity {
   // Remove all wire connections
   removeAllConnections() {
     for (let i = 0; i < this.connections.length; i++) {
-      let ent = this.connections[i].entity;
+      const ent = this.connections[i].entity;
       for (let j = 0; j < ent.connections.length; j++) {
-        if (ent.connections[j].entity == this) {
+        if (ent.connections[j].entity === this) {
           ent.connections.splice(j, 1);
           break;
         }
@@ -330,8 +330,8 @@ export default class Entity {
     name = this.bp.checkName(name);
     if (name == null) delete this[filter][pos];
     else this[filter][pos] = {
-          name: name,
-          count: amt || 0
+          name,
+          count: amt || 0,
         };
     return this;
   }
@@ -352,25 +352,25 @@ export default class Entity {
 
   // Sets condition of entity (for combinators)
   setCondition(opt) {
-    if (opt.countFromInput != undefined && this.name != 'decider_combinator') throw new Error('Cannot set countFromInput for '+this.name);
-    else if (opt.readMode && (opt.readMode != 'pulse' && opt.readMode != 'hold')) throw new Error('readMode in a condition must be "pulse" or "hold"!');
-    else if (this.name == 'arithmetic_combinator' && (opt.left == 'signal_everything' || opt.out == 'signal_everything' || opt.left == 'signal_anything' || opt.out == 'signal_anything'))
+    if (opt.countFromInput !== undefined && this.name !== 'decider_combinator') throw new Error('Cannot set countFromInput for ' + this.name);
+    else if (opt.readMode && (opt.readMode !== 'pulse' && opt.readMode !== 'hold')) throw new Error('readMode in a condition must be "pulse" or "hold"!');
+    else if (this.name === 'arithmetic_combinator' && (opt.left === 'signal_everything' || opt.out === 'signal_everything' || opt.left === 'signal_anything' || opt.out === 'signal_anything'))
       throw new Error('Only comparitive conditions can contain signal_everything or signal_anything. Instead use signal_each');
-    else if (opt.out == 'signal_each' && opt.left != 'signal_each')
-      throw new Error('Left condition must be signal_each for output to be signal_each.'+(this.name != 'arithmetic_combinator' ? ' Use signal_everything for the output instead' : ''));
+    else if (opt.out === 'signal_each' && opt.left !== 'signal_each')
+      throw new Error('Left condition must be signal_each for output to be signal_each.' + (this.name !== 'arithmetic_combinator' ? ' Use signal_everything for the output instead' : ''));
 
     if (opt.left) opt.left = this.bp.checkName(opt.left);
-    if (typeof opt.right == 'string') opt.right = this.bp.checkName(opt.right);
+    if (typeof opt.right === 'string') opt.right = this.bp.checkName(opt.right);
     if (opt.out) opt.out = this.bp.checkName(opt.out);
-    const checkAllow = name => {
-      if (opt[name] != undefined) {
+    const checkAllow = (name) => {
+      if (opt[name] !== undefined) {
         return opt[name];
-      } else if (this.condition[name] != undefined) {
+      } else if (this.condition[name] !== undefined) {
         return this.condition[name];
       } else {
         return undefined;
       }
-    }
+    };
     if (!this.condition) this.condition = {};
     this.condition = {
       left: checkAllow('left'),
@@ -381,7 +381,7 @@ export default class Entity {
 
       controlEnable: checkAllow('controlEnable'), // circuit_enable_disable, true/false
       readContents: checkAllow('readContents'), // circuit_read_hand_contents, true/false
-      readMode: checkAllow('readMode') // circuit_contents_read_mode, 0 or 1
+      readMode: checkAllow('readMode'), // circuit_contents_read_mode, 0 or 1
     };
     return this;
   }
@@ -389,15 +389,15 @@ export default class Entity {
   // Sets direction of entity
   setDirection(dir) {
     // if (this.direction == null) return this; // Prevent rotation when we know what things can rotate in defaultentities.js
-    this.size = new Victor((dir % 4 == this.direction % 4 ? this.size.x : this.size.y),
-                            (dir % 4 == this.direction % 4 ? this.size.y : this.size.x));
+    this.size = new Victor((dir % 4 === this.direction % 4 ? this.size.x : this.size.y),
+                           (dir % 4 === this.direction % 4 ? this.size.y : this.size.x));
     this.direction = dir;
     return this;
   }
 
   setDirectionType(type) {
     if (!this.HAS_DIRECTION_TYPE) throw new Error('This type of item does not have a directionType! Usually only underground belts have these.');
-    else if (type != 'input' && type != 'output') throw new Error('setDirectionType() accepts the string "input" and "output" only');
+    else if (type !== 'input' && type !== 'output') throw new Error('setDirectionType() accepts the string "input" and "output" only');
     this.directionType = type;
 
     return this;
@@ -413,8 +413,8 @@ export default class Entity {
 
   setBar(num) {
     if (!this.INVENTORY_SIZE) throw new Error('Only entities with inventories can have bars!');
-    else if (typeof num == 'number' && num < 0) throw new Error('You must provide a positive value to setBar()');
-    this.bar = typeof num != 'number' || num >= this.INVENTORY_SIZE ? -1 : num;
+    else if (typeof num === 'number' && num < 0) throw new Error('You must provide a positive value to setBar()');
+    this.bar = typeof num !== 'number' || num >= this.INVENTORY_SIZE ? -1 : num;
 
     return this;
   }
@@ -441,13 +441,13 @@ export default class Entity {
   }
 
   setConstant(pos, name, count) {
-    if (this.name != 'constant_combinator') throw new Error('Can only set constants for constant combinators!');
-    else if (pos < 0 || pos >= 18) throw new Error(pos+' is an invalid position (must be between 0 and 17 inclusive)');
+    if (this.name !== 'constant_combinator') throw new Error('Can only set constants for constant combinators!');
+    else if (pos < 0 || pos >= 18) throw new Error(pos + ' is an invalid position (must be between 0 and 17 inclusive)');
 
     if (!name) delete this.constants[pos];
     else this.constants[pos] = {
       name: this.bp.checkName(name),
-      count: count == undefined ? 0 : count
+      count: count === undefined ? 0 : count,
     };
 
     return this;
@@ -540,41 +540,41 @@ export default class Entity {
   }*/
 
   getData() {
-    const useValueOrDefault = (val, def) => val != undefined ? val : def;
+    const useValueOrDefault = (val, def) => val !== undefined ? val : def;
 
     const getCondition = () => {
       // let key = this.name == 'arithmetic_combinator' ? 'arithmetic' : (this.name == 'decider_combinator' ? 'decider' : 'circuit');
       const out = {
         first_signal: (this.condition.left ? {
           type: entityData[this.condition.left].type,
-          name: this.condition.left.replace(/_/g, '-')
+          name: this.condition.left.replace(/_/g, '-'),
         } : undefined),
-        second_signal: (typeof this.condition.right == 'string' ? {
+        second_signal: (typeof this.condition.right === 'string' ? {
           type: entityData[this.condition.right].type,
-          name: this.condition.right.replace(/_/g, '-')
+          name: this.condition.right.replace(/_/g, '-'),
         } : undefined),
-        constant: typeof this.condition.right == 'number' ? this.condition.right : undefined,
+        constant: typeof this.condition.right === 'number' ? this.condition.right : undefined,
         operation: undefined,
         comparator: undefined,
         output_signal: (this.condition.out ? {
           type: entityData[this.condition.out].type,
-          name: this.condition.out.replace(/_/g, '-')
+          name: this.condition.out.replace(/_/g, '-'),
         } : undefined),
 
         circuit_enable_disable: this.condition.controlEnable,
         circuit_read_hand_contents: this.condition.readContents,
-        circuit_contents_read_mode: this.condition.readMode != undefined ? (this.condition.readMode == 'pulse' ? 0 : 1) : undefined,
+        circuit_contents_read_mode: this.condition.readMode !== undefined ? (this.condition.readMode === 'pulse' ? 0 : 1) : undefined,
         // XXX
         copy_count_from_input: null,
       };
-      if (this.name != 'arithmetic_combinator') {
+      if (this.name !== 'arithmetic_combinator') {
         out.comparator = this.condition.operator;
-        out.copy_count_from_input = this.condition.countFromInput != undefined ? (!!this.condition.countFromInput).toString() : undefined;
+        out.copy_count_from_input = this.condition.countFromInput !== undefined ? (!!this.condition.countFromInput).toString() : undefined;
       } else {
         out.operation = this.condition.operator;
       }
       return out;
-    }
+    };
 
     return {
       name: this.bp.fixName(this.name),
@@ -583,18 +583,18 @@ export default class Entity {
 
       type: /*this.HAS_DIRECTION_TYPE*/ this.directionType ? this.directionType : undefined,
       recipe: /*this.CAN_HAVE_RECIPE &&*/ this.recipe ? this.bp.fixName(this.recipe) : undefined,
-      bar: /*this.INVENTORY_SIZE &&*/ (this.bar != -1) ? this.bar : undefined,
+      bar: /*this.INVENTORY_SIZE &&*/ (this.bar !== -1) ? this.bar : undefined,
 
-      items: /*this.CAN_HAVE_MODULES &&*/ this.modules ? this.modules.map(module => {
-        return { item: this.bp.fixName(module.item), count: module.count }
+      items: /*this.CAN_HAVE_MODULES &&*/ this.modules ? this.modules.map((module) => {
+        return { item: this.bp.fixName(module.item), count: module.count };
       }) : undefined,
 
-      filters: makeEmptyArrayUndefined(Object.keys(this.filters).map(index => {
+      filters: makeEmptyArrayUndefined(Object.keys(this.filters).map((index) => {
         const filter = this.filters[index];
         const type = entityData[filter.name].type;
 
         const obj = { 
-          index: parseInt(index),
+          index: Number.parseInt(index),
           signal: null,
           count: null,
           name: null,
@@ -602,7 +602,7 @@ export default class Entity {
         if (this.FILTER_AMOUNT) {
           obj.signal = {
             name: this.bp.fixName(filter.name),
-            type: type
+            type,
           };
           obj.count = filter.count;
         } else {
@@ -611,58 +611,58 @@ export default class Entity {
         return obj;
       })),
 
-      request_filters: makeEmptyArrayUndefined(Object.keys(this.requestFilters).map(index => {
+      request_filters: makeEmptyArrayUndefined(Object.keys(this.requestFilters).map((index) => {
         const rFilter = this.requestFilters[index];
         return {
           name: this.bp.fixName(rFilter.name),
           count: rFilter.count,
-          index: parseInt(index)
-        }
+          index: Number.parseInt(index),
+        };
       })),
 
       connections: this.connections.length || this.condition || Object.keys(this.condition).length || Object.keys(this.circuitParameters).length ? this.connections.reduce((obj, connection) => {
-        let side = connection.side;
-        let color = connection.color;
+        const side = connection.side;
+        const color = connection.color;
         if (!obj[side]) obj[side] = {};
         if (!obj[side][color]) obj[side][color] = [];
         obj[side][color].push({ entity_id: connection.entity.id, circuit_id: connection.id });
         return obj;
-      }, {}) : undefined,
+      },                                                                                                                                                                   {}) : undefined,
 
       parameters: this.parameters ? {
         playback_volume: useValueOrDefault(this.parameters.volume, 1.0),
         playback_globally: useValueOrDefault(this.parameters.playGlobally, false),
-        allow_polyphony: useValueOrDefault(this.parameters.allowPolyphony, true)
+        allow_polyphony: useValueOrDefault(this.parameters.allowPolyphony, true),
       } : undefined,
 
       alert_parameters: this.alertParameters ? {
         show_alert: useValueOrDefault(this.alertParameters.showAlert, false),
         show_on_map: useValueOrDefault(this.alertParameters.showOnMap, true),
-        alert_message: useValueOrDefault(this.alertParameters.message, '')
+        alert_message: useValueOrDefault(this.alertParameters.message, ''),
       } : undefined,
 
-      control_behavior: this.constants || this.condition || this.name == 'decider_combinator' || this.name == 'arithmetic_combinator' ? {
+      control_behavior: this.constants || this.condition || this.name === 'decider_combinator' || this.name === 'arithmetic_combinator' ? {
         filters: this.constants && Object.keys(this.constants).length ? Object.keys(this.constants).map((key, i) => {
           const data = this.constants[key];
           return {
             signal: {
               name: this.bp.fixName(data.name),
-              type: entityData[data.name].type
+              type: entityData[data.name].type,
             },
-            count: data.count != undefined ? data.count : 0,
-            index: parseInt(key) + 1
+            count: data.count !== undefined ? data.count : 0,
+            index: Number.parseInt(key) + 1,
           };
         }) : undefined,
 
-        decider_conditions: this.name == 'decider_combinator' ? getCondition() : undefined,
-        arithmetic_conditions: this.name == 'arithmetic_combinator' ? getCondition() : undefined,
+        decider_conditions: this.name === 'decider_combinator' ? getCondition() : undefined,
+        arithmetic_conditions: this.name === 'arithmetic_combinator' ? getCondition() : undefined,
         circuit_condition: !this.name.includes('combinator') && Object.keys(this.condition).length ? getCondition() : undefined,
 
         circuit_parameters: this.circuitParameters ? {
           signal_value_is_pitch: useValueOrDefault(this.circuitParameters.signalIsPitch, false),
           instrument_id: useValueOrDefault(this.circuitParameters.instrument, 0),
-          note_id: useValueOrDefault(this.circuitParameters.note, 0)
-        } : undefined
+          note_id: useValueOrDefault(this.circuitParameters.note, 0),
+        } : undefined,
       } : undefined,
     };
   }
@@ -678,10 +678,10 @@ export default class Entity {
 // Convert 'in' or 'out' of wires (only combinators have both of these) to a 1 or 2.
 function convertSide(side, ent) {
   if (!side) return 1;
-  if (side == 1 || side == 2) return side;
-  else if (side == 'in' || side == 'out') {
-    if (ent && ent.name != 'arithmetic_combinator' && ent.name != 'decider_combinator') return 1;
-    else return side == 'in' ? 1 : 2;
+  if (side === 1 || side === 2) return side;
+  else if (side === 'in' || side === 'out') {
+    if (ent && ent.name !== 'arithmetic_combinator' && ent.name !== 'decider_combinator') return 1;
+    else return side === 'in' ? 1 : 2;
   } else throw new Error('Invalid side');
 }
 

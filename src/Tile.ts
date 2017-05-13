@@ -1,4 +1,4 @@
-import Victor from 'victor';
+import * as Victor from 'victor';
 
 import Blueprint from './Blueprint';
 

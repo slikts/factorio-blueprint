@@ -4,7 +4,7 @@ import * as zlib from 'zlib';
 import { Buffer } from 'buffer';
 import Entity from './Entity';
 import Tile from './Tile';
-import entityData from '../defaultentities';
+import entityData from '../entityData';
 
 const defaultOpts = {
   fixEntityData: false,
@@ -58,7 +58,7 @@ export default class Blueprint {
 
     this.version = data.version;
 
-    data.entities.forEach(entity => {
+    data.entities.forEach((entity) => {
       if (opt.fixEntityData) {
         const data = {};
         data[this.jsName(entity.name)] = { type: 'item', width: 1, height: 1 };
@@ -66,16 +66,16 @@ export default class Blueprint {
       }
       this.createEntityWithData(entity, opt.allowOverlap, true, true); // no overlap (unless option allows it), place altogether later, positions are their center
     });
-    this.entities.forEach(entity => {
+    this.entities.forEach((entity) => {
       entity.place(this.entityPositionGrid, this.entities);
     });
 
-    data.tiles.forEach(tile => {
+    data.tiles.forEach((tile) => {
       this.createTile(tile.name, tile.position);
     });
 
     this.icons = [];
-    data.icons.forEach(icon => {
+    data.icons.forEach((icon) => {
       this.icons[icon.index - 1] = this.checkName(icon.signal.name);
     });
 
@@ -86,7 +86,7 @@ export default class Blueprint {
 
   placeBlueprint(bp, position, direction, allowOverlap) { // direction is 0, 1, 2, or 3
     const entitiesCreated = [];
-    bp.entities.forEach(ent => {
+    bp.entities.forEach((ent) => {
       const data = ent.getData();
 
       data.direction += (direction || 0) * 2;
@@ -103,11 +103,11 @@ export default class Blueprint {
       entitiesCreated.push(this.createEntityWithData(data, allowOverlap, true, true));
     });
 
-    entitiesCreated.forEach(e => {
+    entitiesCreated.forEach((e) => {
       e.place(this.entityPositionGrid, this.entitiesCreated);
     });
 
-    bp.tiles.forEach(tile => {
+    bp.tiles.forEach((tile) => {
       const data = tile.getData();
 
       if (direction === 1) data.position = { x: data.position.y, y: -data.position.x };
@@ -166,8 +166,9 @@ export default class Blueprint {
 
   // Removes a specific entity
   removeEntity(ent) {
-    if (!ent) return false;
-    else {
+    if (!ent) {
+      return false;
+    } else {
       ent.removeCleanup(this.entityPositionGrid);
       const index = this.entities.indexOf(ent);
       if (index === -1) return ent;
@@ -177,8 +178,9 @@ export default class Blueprint {
   }
 
   removeTile(tile) {
-    if (!tile) return false;
-    else {
+    if (!tile) {
+      return false;
+    } else {
       const index = this.tiles.indexOf(tile);
       if (index === -1) return tile;
       this.tiles.splice(index, 1);
@@ -227,12 +229,12 @@ export default class Blueprint {
     const offsetY = aroundPoint ? -aroundPoint.y : -Math.floor(this.center().y / 2) * 2;
     const offset = new Victor(offsetX, offsetY);
     this.entities.forEach(entity => entity.removeTileData(this.entityPositionGrid));
-    this.entities.forEach(entity => {
+    this.entities.forEach((entity) => {
       entity.position.add(offset);
       entity.setTileData(this.entityPositionGrid);
     });
     this.tiles.forEach(tile => delete this.tilePositionGrid[tile.position.x + ',' + tile.position.y]);
-    this.tiles.forEach(tile => {
+    this.tiles.forEach((tile) => {
       tile.position.add(offset);
       this.tilePositionGrid[tile.position.x + ',' + tile.position.y] = tile;
     });
